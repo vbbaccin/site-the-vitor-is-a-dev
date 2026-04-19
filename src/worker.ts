@@ -3,32 +3,29 @@
 export default {
 	async fetch(request: Request, env: any): Promise<Response> {
 		const url = new URL(request.url);
+		let pathname = url.pathname;
 
-		// Handle root path
-		if (url.pathname === '/') {
-			url.pathname = '/index.html';
-		}
-
-		// Try to get the static asset
-		const asset = await env.__STATIC_CONTENT.get(url.pathname);
+		// Try to get the static asset first
+		let asset = await env.__STATIC_CONTENT.get(pathname);
 
 		if (asset) {
-			const contentType = getContentType(url.pathname);
+			const contentType = getContentType(pathname);
 			return new Response(asset, {
 				headers: {
 					'Content-Type': contentType,
-					'Cache-Control': url.pathname.endsWith('.html')
+					'Cache-Control': pathname.endsWith('.html')
 						? 'public, max-age=0, must-revalidate'
 						: 'public, max-age=3600',
 				},
 			});
 		}
 
-		// Try index.html if directory-like path
-		if (!url.pathname.includes('.')) {
-			const indexAsset = await env.__STATIC_CONTENT.get(url.pathname + '/index.html');
-			if (indexAsset) {
-				return new Response(indexAsset, {
+		// For SPA routing: if path doesn't have a file extension and doesn't exist,
+		// serve index.html so the frontend router can handle it
+		if (!pathname.includes('.') || pathname === '/') {
+			asset = await env.__STATIC_CONTENT.get('/index.html');
+			if (asset) {
+				return new Response(asset, {
 					headers: {
 						'Content-Type': 'text/html',
 						'Cache-Control': 'public, max-age=0, must-revalidate',
