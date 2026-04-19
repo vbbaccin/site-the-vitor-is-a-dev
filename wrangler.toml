@@ -1,7 +1,8 @@
 name = "vitor-portfolio"
-main = "dist"
+main = "src/worker.ts"
 compatibility_date = "2024-01-01"
+assets = { directory = "dist" }
 
 [env.production]
 name = "vitor-portfolio-prod"
-route = "the-vitor.is-a.dev/*"
+routes = [{ pattern = "the-vitor.is-a.dev/*", zone_name = "is-a.dev" }]
