@@ -1,3 +1,5 @@
+/// <reference types="@cloudflare/workers-types" />
+
 export default {
 	async fetch(request: Request, env: any): Promise<Response> {
 		const url = new URL(request.url);
@@ -37,7 +39,7 @@ export default {
 
 		return new Response('404 - Not Found', { status: 404 });
 	},
-} satisfies ExportedHandler;
+} as ExportedHandler;
 
 function getContentType(pathname: string): string {
 	if (pathname.endsWith('.html')) return 'text/html';
